@@ -822,6 +822,8 @@ async function loadSelectedDataset() {
 	const candidatePaths = [selectedPath, ...DATASET_FALLBACKS.filter((path) => path !== selectedPath)];
 
 	button.disabled = true;
+	document.getElementById("summaryPanel").classList.add("hidden");
+	document.getElementById("dashboard").classList.add("hidden");
 	setStatus("Loading dataset and preparing visualizations...");
 
 	try {
