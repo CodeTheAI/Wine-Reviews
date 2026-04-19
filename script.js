@@ -749,6 +749,29 @@ function setupVisualizationModal() {
 	});
 }
 
+function purgeAllCharts() {
+	const chartIds = [
+		"countryVolumeChart",
+		"countryQualityChart",
+		"priceDistributionChart",
+		"scoreDistributionChart",
+		"priceScoreScatterChart",
+		"varietyTreemapChart",
+		"wineryLeadersChart",
+		"priceByCountryChart",
+		"scoreBandsChart",
+		"valueIndexChart",
+		"flavorLexiconChart",
+	];
+
+	for (const chartId of chartIds) {
+		const element = document.getElementById(chartId);
+		if (element) {
+			Plotly.purge(element);
+		}
+	}
+}
+
 function resizeAllCharts() {
 	const chartIds = [
 		"countryVolumeChart",
@@ -773,6 +796,7 @@ function resizeAllCharts() {
 }
 
 function renderDashboard(rows) {
+	purgeAllCharts();
 	updateSummary(rows);
 	renderCountryVolume(rows);
 	renderCountryQuality(rows);
