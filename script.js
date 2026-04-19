@@ -1,8 +1,10 @@
+// Dataset configuration and fallback paths for loading CSV data
 const DATASET_FALLBACKS = [
 	"./datasets/winemag-data-130k-v2.csv",
 	"./datasets/winemag-data_first150k.csv",
 ];
 
+// Color palette for consistent visualization styling across all charts
 const PLOT_COLORS = [
 	"#8B1E2C",
 	"#D26639",
@@ -14,7 +16,10 @@ const PLOT_COLORS = [
 	"#9C3F64",
 ];
 
+// Global dataset storage - holds all cleaned and processed wine review data
 window.ds = [];
+
+// ===== UTILITY FUNCTIONS: Data Type Conversion & Validation =====
 
 function toNumber(value) {
 	const number = Number(value);
@@ -29,6 +34,7 @@ function normalizeText(value, fallback = "Unknown") {
 	return text ? text : fallback;
 }
 
+// Updates the status message displayed to the user with optional styling tone
 function setStatus(message, tone = "") {
 	const statusElement = document.getElementById("status");
 	if (!statusElement) {
@@ -40,6 +46,8 @@ function setStatus(message, tone = "") {
 		statusElement.classList.add(tone);
 	}
 }
+
+// ===== CSV PARSING: Load and parse CSV data from URLs =====
 
 function parseCsv(url) {
 	return (async () => {
@@ -100,6 +108,8 @@ function parseCsv(url) {
 	})();
 }
 
+// ===== DATA AGGREGATION & STATISTICS: Helper functions for data analysis =====
+
 function countBy(rows, accessor) {
 	const map = new Map();
 	for (const row of rows) {
@@ -109,10 +119,12 @@ function countBy(rows, accessor) {
 	return map;
 }
 
+// Returns the top N entries from a Map sorted by value in descending order
 function topEntries(map, limit = 10) {
 	return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
 }
 
+// Calculates the percentile value from a sorted array (q: 0-1, where 0.5 is median)
 function percentile(sortedValues, q) {
 	if (!sortedValues.length) {
 		return null;
@@ -120,6 +132,9 @@ function percentile(sortedValues, q) {
 	const position = (sortedValues.length - 1) * q;
 	const base = Math.floor(position);
 	const rest = position - base;
+// ===== CHART CONFIGURATION: Plotly layout and styling functions =====
+
+// Standard chart layout configuration with consistent title and axis styling
 	const next = sortedValues[base + 1] !== undefined ? sortedValues[base + 1] : sortedValues[base];
 	return sortedValues[base] + rest * (next - sortedValues[base]);
 }
@@ -173,6 +188,8 @@ function sanitizeRows(rows) {
 	}));
 }
 
+// ===== SUMMARY METRICS: Calculate and display key statistics =====
+
 function updateSummary(rows) {
 	const total = rows.length;
 	const prices = rows.map((row) => row.price).filter((value) => value !== null).sort((a, b) => a - b);
@@ -193,6 +210,9 @@ function updateSummary(rows) {
 	document.getElementById("metricTopVariety").textContent = topVariety;
 }
 
+// ===== CHART RENDERING: Individual visualization functions =====
+
+// Review volume by country - horizontal bar chart
 function renderCountryVolume(rows) {
 	const topCountries = topEntries(countBy(rows, (row) => row.country), 14).reverse();
 	Plotly.react(
@@ -215,6 +235,7 @@ function renderCountryVolume(rows) {
 	);
 }
 
+// Quality rankings by country - average score comparison
 function renderCountryQuality(rows) {
 	const accumulator = new Map();
 	for (const row of rows) {
@@ -260,6 +281,7 @@ function renderCountryQuality(rows) {
 	);
 }
 
+// Price distribution histogram - shows bottle price spread
 function renderPriceDistribution(rows) {
 	const prices = rows
 		.map((row) => row.price)
@@ -288,6 +310,7 @@ function renderPriceDistribution(rows) {
 	);
 }
 
+// Expert rating distribution - where most scores cluster
 function renderScoreDistribution(rows) {
 	const points = rows.map((row) => row.points).filter((pointsValue) => pointsValue !== null);
 
@@ -314,6 +337,7 @@ function renderScoreDistribution(rows) {
 	);
 }
 
+// Price vs score scatter plot - analyze correlation between price and ratings
 function renderPriceScoreScatter(rows) {
 	const pointsWithPrice = rows.filter(
 		(row) => row.price !== null && row.price > 0 && row.price <= 350 && row.points !== null
@@ -362,6 +386,7 @@ function renderPriceScoreScatter(rows) {
 	);
 }
 
+// Most reviewed grape varieties - treemap visualization
 function renderVarietyTreemap(rows) {
 	const topVarieties = topEntries(countBy(rows, (row) => row.variety), 25);
 
@@ -388,6 +413,7 @@ function renderVarietyTreemap(rows) {
 		chartConfig()
 	);
 }
+// Most frequently reviewed wineries
 
 function renderWineryLeaders(rows) {
 	const topWineries = topEntries(countBy(rows, (row) => row.winery), 16).reverse();
@@ -412,6 +438,7 @@ function renderWineryLeaders(rows) {
 	);
 }
 
+// Price range comparison across top wine-producing countries
 function renderPriceByCountry(rows) {
 	const countryCounts = topEntries(countBy(rows, (row) => row.country), 8).map((entry) => entry[0]);
 	const traces = countryCounts.map((country, index) => {
@@ -442,6 +469,7 @@ function renderPriceByCountry(rows) {
 		chartConfig()
 	);
 }
+// Score banding - visualize rating tiers
 
 function renderScoreBands(rows) {
 	const bands = {
@@ -491,6 +519,7 @@ function renderScoreBands(rows) {
 		chartConfig()
 	);
 }
+// Value index - price-to-score ratio analysis
 
 function renderValueIndex(rows) {
 	const groups = new Map();
@@ -545,6 +574,7 @@ function renderValueIndex(rows) {
 		chartConfig()
 	);
 }
+// Flavor descriptors word cloud - analyze review language patterns
 
 function renderFlavorLexicon(rows) {
 	const stopWords = new Set([
@@ -625,6 +655,8 @@ function renderFlavorLexicon(rows) {
 	);
 }
 
+// ===== UI INTERACTIONS: Modal and panel management =====
+
 function revealPanels() {
 	document.getElementById("summaryPanel").classList.remove("hidden");
 	document.getElementById("dashboard").classList.remove("hidden");
@@ -637,6 +669,7 @@ function clonePlotObject(value) {
 	return JSON.parse(JSON.stringify(value));
 }
 
+// Opens detailed visualization modal with expanded chart
 function openVisualizationModal(card) {
 	const modal = document.getElementById("vizModal");
 	const modalTitle = document.getElementById("vizModalTitle");
@@ -690,6 +723,7 @@ function openVisualizationModal(card) {
 	});
 }
 
+// Closes the expanded visualization modal
 function closeVisualizationModal() {
 	const modal = document.getElementById("vizModal");
 	const modalChart = document.getElementById("modalChart");
@@ -707,6 +741,7 @@ function closeVisualizationModal() {
 	}
 }
 
+// Initializes modal click handlers and keyboard interactions
 function setupVisualizationModal() {
 	const dashboard = document.getElementById("dashboard");
 	const modal = document.getElementById("vizModal");
@@ -749,6 +784,9 @@ function setupVisualizationModal() {
 	});
 }
 
+// ===== CHART MANAGEMENT: Purge and initialize all chart elements =====
+
+// Removes all existing Plotly charts from the DOM
 function purgeAllCharts() {
 	const chartIds = [
 		"countryVolumeChart",
@@ -792,6 +830,9 @@ function resizeAllCharts() {
 		if (element) {
 			Plotly.Plots.resize(element);
 		}
+// ===== MAIN DASHBOARD RENDERER: Orchestrates all visualizations =====
+
+// Purges old charts, updates summary, and renders all visualizations
 	}
 }
 
@@ -812,6 +853,10 @@ function renderDashboard(rows) {
 	revealPanels();
 	requestAnimationFrame(() => {
 		setTimeout(resizeAllCharts, 100);
+// ===== DATASET LOADING & INITIALIZATION =====
+
+// Main function: Loads selected dataset, sanitizes it, and renders dashboard
+// Hides old visualizations when switching datasets to match initial page load behavior
 	});
 }
 
@@ -867,6 +912,9 @@ async function loadSelectedDataset() {
 	} finally {
 		button.disabled = false;
 	}
+// ===== SETUP FUNCTIONS: Initialize page elements and event listeners =====
+
+// Initializes the opening loader animation sequence
 }
 
 window.loadDataset = loadSelectedDataset;
@@ -889,6 +937,7 @@ function setupOpeningLoader() {
 			return;
 		}
 		openingLoader.remove();
+// Initializes the page when DOM is fully loaded
 	});
 }
 

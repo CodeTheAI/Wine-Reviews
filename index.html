@@ -1,4 +1,9 @@
 <!doctype html>
+<!-- 
+Wine Atlas - Review Intelligence Dashboard
+An interactive data visualization platform for wine review analysis.
+Provides insights into review trends, quality metrics, and flavor profiles across datasets.
+-->
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -13,6 +18,7 @@
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body class="intro-active">
+		<!-- Opening loader animation with truck and decorative elements -->
 		<div id="openingLoader" class="opening-loader" aria-hidden="true">
 			<div class="loader">
 				<div class="truckWrapper">
@@ -80,11 +86,13 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"
 			</div>
 		</div>
 
+		<!-- Background decorative elements: animated orbs and grid pattern -->
 		<div class="bg-orb bg-orb-a" aria-hidden="true"></div>
 		<div class="bg-orb bg-orb-b" aria-hidden="true"></div>
 		<div class="bg-grid" aria-hidden="true"></div>
 
 		<main class="page">
+			<!-- Hero section with introduction and dataset selection controls -->
 			<section class="hero">
 				<p class="eyebrow">Data Storytelling Experience</p>
 				<h1>Wine Atlas Dashboard</h1>
@@ -94,6 +102,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"
 					and flavor language signals.
 				</p>
 
+				<!-- Dataset selector and generate button -->
 				<div class="controls" role="group" aria-label="Dataset controls">
 					<label for="datasetSelect" class="sr-only">Choose dataset</label>
 					<select id="datasetSelect" aria-label="Dataset file selection">
@@ -110,6 +119,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"
 				<p id="status" class="status">Ready when you are.</p>
 			</section>
 
+			<!-- Summary statistics panel: displays key metrics from the loaded dataset -->
 			<section id="summaryPanel" class="summary-panel hidden" aria-live="polite">
 				<div class="metric-card">
 					<p class="metric-label">Total Reviews</p>
@@ -133,9 +143,10 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"
 				</div>
 			</section>
 
+			<!-- Main visualization grid: displays all interactive charts -->
 			<section id="dashboard" class="viz-grid hidden" aria-live="polite">
 				<!-- Geographic & Market Analysis -->
-			<article class="viz-card">
+				<article class="viz-card">
 				<h2>Where Reviews Come From</h2>
 							<p>
 								Top producing countries by review volume, highlighting market coverage in

@@ -1,3 +1,5 @@
+/* ===== DESIGN TOKENS & COLOR SYSTEM ===== */
+/* Custom properties for consistent theming throughout the application */
 :root {
 	--bg-top: #f5ead9;
 	--bg-mid: #efe2cf;
@@ -16,6 +18,8 @@
 	--shadow-md: 0 10px 26px rgba(28, 29, 34, 0.11);
 }
 
+/* ===== GLOBAL STYLES & RESET ===== */
+/* Base element styles and general layout rules */
 * {
 	box-sizing: border-box;
 }
@@ -36,6 +40,8 @@ body {
 
 body.intro-active {
 	overflow: hidden;
+/* ===== OPENING LOADER: Animated truck delivery introduction ===== */
+/* Full-screen splash animation on page load */
 }
 
 .opening-loader {
@@ -156,6 +162,8 @@ body.intro-active {
 		transform: translateX(0px);
 	}
 	100% {
+/* ===== BACKGROUND ELEMENTS: Decorative animated orbs and grid ===== */
+/* Animated orb elements for visual depth */
 		transform: translateX(-350px);
 	}
 }
@@ -247,6 +255,8 @@ h1 {
 	color: var(--ink-700);
 }
 
+/* ===== CONTROLS: Dataset selection and generate button ===== */
+/* Dropdown and button styling for dataset interaction */
 .controls {
 	margin-top: 1.1rem;
 	display: grid;
@@ -266,6 +276,7 @@ button {
 	padding: 0 1rem;
 }
 
+/* Select dropdown styling */
 select {
 	background: rgba(255, 255, 255, 0.9);
 	border: 1px solid rgba(34, 37, 43, 0.18);
@@ -273,6 +284,7 @@ select {
 	box-shadow: var(--shadow-md);
 }
 
+/* Primary action button */
 button {
 	background: linear-gradient(120deg, var(--accent-a), var(--accent-b));
 	color: var(--cream);
@@ -293,6 +305,7 @@ button:disabled {
 	opacity: 0.78;
 }
 
+/* Status message display with tone indicators */
 .status {
 	margin: 0.85rem 0 0;
 	font-weight: 700;
@@ -306,6 +319,8 @@ button:disabled {
 
 .status.success {
 	color: #0b756f;
+/* ===== SUMMARY PANEL: Key statistics display ===== */
+/* Container for summary metric cards */
 }
 
 .summary-panel {
@@ -314,6 +329,7 @@ button:disabled {
 	gap: 0.8rem;
 }
 
+/* Individual metric card styling */
 .metric-card {
 	padding: 0.85rem 1rem;
 	background: var(--card);
@@ -508,10 +524,14 @@ button:disabled {
 	background: rgba(255, 252, 247, 0.75);
 }
 
+/* ===== UTILITIES & HELPERS ===== */
+/* Utility classes for common states and accessibility */
 .hidden {
 	display: none;
 }
 
+/* ===== ACCESSIBILITY: Screen reader and utility classes ===== */
+/* Screen reader only - visually hidden but accessible */
 .sr-only {
 	position: absolute;
 	width: 1px;
@@ -524,6 +544,7 @@ button:disabled {
 	border: 0;
 }
 
+/* Panel reveal animation - smooth fade and slide sequence */
 @keyframes revealUp {
 	to {
 		opacity: 1;
