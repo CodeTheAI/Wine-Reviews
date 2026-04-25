@@ -1270,8 +1270,8 @@ function setupOpeningLoader() {
 		document.body.classList.remove("intro-active");
 	};
 
-	window.setTimeout(startExit, 5000);
-	window.setTimeout(removeLoader, 6200);
+	window.setTimeout(startExit, 3000);
+	window.setTimeout(removeLoader, 4000);
 
 	openingLoader.addEventListener("transitionend", (event) => {
 		if (event.propertyName !== "transform") {

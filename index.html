@@ -200,6 +200,28 @@ Provides insights into review trends, quality metrics, and flavor profiles acros
 			</div>
 		</div>
 
+		<script>
+			(function () {
+				const LOADER_DURATION_MS = 3000;
+				const LOADER_EXIT_MS = 1000;
+
+				window.setTimeout(function dismissOpeningLoaderFallback() {
+					const loader = document.getElementById("openingLoader");
+					if (loader) {
+						loader.classList.add("exit");
+						window.setTimeout(function removeLoader() {
+							if (loader.parentNode) {
+								loader.parentNode.removeChild(loader);
+							}
+						}, LOADER_EXIT_MS);
+					}
+					if (document.body) {
+						document.body.classList.remove("intro-active");
+					}
+				}, LOADER_DURATION_MS);
+			})();
+		</script>
+
 		<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 		<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 		<script src="script.js"></script>
