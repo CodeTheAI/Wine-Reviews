@@ -771,17 +771,12 @@ tbody tr:hover {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 
-<<<<<<< HEAD
 	.analysis-grid {
 		grid-template-columns: 1fr;
-=======
-	.viz-dashboard {
-		gap: 1.8rem;
 	}
 
 	.section-title {
 		font-size: clamp(1.25rem, 2.4vw, 1.7rem);
->>>>>>> 2b7b8b225bf850a5d3b17858420d405ee23eec39
 	}
 
 	.viz-grid {

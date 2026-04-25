@@ -190,7 +190,6 @@ function sanitizeRows(rows) {
 	}));
 }
 
-<<<<<<< HEAD
 function mean(values) {
 	if (!values.length) {
 		return 0;
@@ -497,11 +496,6 @@ function renderInsights(rows) {
 }
 
 function updateSummary(rows, shownCount = rows.length) {
-=======
-// ===== SUMMARY METRICS: Calculate and display key statistics =====
-
-function updateSummary(rows) {
->>>>>>> 2b7b8b225bf850a5d3b17858420d405ee23eec39
 	const total = rows.length;
 	const prices = rows.map((row) => row.price).filter((value) => value !== null).sort((a, b) => a - b);
 	const points = rows.map((row) => row.points).filter((value) => value !== null);
@@ -1159,11 +1153,8 @@ function resizeAllCharts() {
 }
 
 function renderDashboard(rows) {
-<<<<<<< HEAD
-=======
 	purgeAllCharts();
 	updateSummary(rows);
->>>>>>> 2b7b8b225bf850a5d3b17858420d405ee23eec39
 	renderCountryVolume(rows);
 	renderCountryQuality(rows);
 	renderPriceDistribution(rows);
@@ -1191,16 +1182,18 @@ async function loadSelectedDataset() {
 	const selectedPath = datasetSelect?.value || DATASET_FALLBACKS[0];
 	const candidatePaths = [selectedPath, ...DATASET_FALLBACKS.filter((path) => path !== selectedPath)];
 
-<<<<<<< HEAD
 	if (button) {
 		button.disabled = true;
 	}
-=======
-	button.disabled = true;
-	// Hide the old visualization cards before loading new dataset, matching the initial page load behavior
-	document.getElementById("summaryPanel").classList.add("hidden");
-	document.getElementById("dashboard").classList.add("hidden");
->>>>>>> 2b7b8b225bf850a5d3b17858420d405ee23eec39
+	// Hide previous visualizations while loading a new dataset.
+	const summaryPanel = document.getElementById("summaryPanel");
+	const dashboard = document.getElementById("dashboard");
+	if (summaryPanel) {
+		summaryPanel.classList.add("hidden");
+	}
+	if (dashboard) {
+		dashboard.classList.add("hidden");
+	}
 	setStatus("Loading dataset and preparing visualizations...");
 
 	try {
@@ -1262,18 +1255,29 @@ function setupOpeningLoader() {
 		return;
 	}
 
+	let removed = false;
+
+	const removeLoader = () => {
+		if (removed) {
+			return;
+		}
+		removed = true;
+		openingLoader.remove();
+	};
+
 	const startExit = () => {
 		openingLoader.classList.add("exit");
 		document.body.classList.remove("intro-active");
 	};
 
 	window.setTimeout(startExit, 5000);
+	window.setTimeout(removeLoader, 6200);
 
 	openingLoader.addEventListener("transitionend", (event) => {
 		if (event.propertyName !== "transform") {
 			return;
 		}
-		openingLoader.remove();
+		removeLoader();
 // Initializes the page when DOM is fully loaded
 	});
 }
