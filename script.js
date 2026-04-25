@@ -15,6 +15,7 @@ const PLOT_COLORS = [
 ];
 
 window.ds = [];
+window.dsView = [];
 
 function toNumber(value) {
 	const number = Number(value);
@@ -156,6 +157,7 @@ function markerLine() {
 
 function sanitizeRows(rows) {
 	return rows.map((row) => ({
+		title: normalizeText(row.title),
 		country: normalizeText(row.country),
 		province: normalizeText(row.province),
 		variety: normalizeText(row.variety),
@@ -166,11 +168,315 @@ function sanitizeRows(rows) {
 	}));
 }
 
-function updateSummary(rows) {
+function mean(values) {
+	if (!values.length) {
+		return 0;
+	}
+	return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function variance(values) {
+	if (!values.length) {
+		return 0;
+	}
+	const avg = mean(values);
+	const sumSquares = values.reduce((sum, value) => sum + (value - avg) ** 2, 0);
+	return sumSquares / values.length;
+}
+
+function stdDev(values) {
+	return Math.sqrt(variance(values));
+}
+
+function pearsonCorr(xValues, yValues) {
+	if (!xValues.length || xValues.length !== yValues.length) {
+		return 0;
+	}
+
+	const xMean = mean(xValues);
+	const yMean = mean(yValues);
+
+	let numerator = 0;
+	let xDenominator = 0;
+	let yDenominator = 0;
+
+	for (let index = 0; index < xValues.length; index += 1) {
+		const xDiff = xValues[index] - xMean;
+		const yDiff = yValues[index] - yMean;
+		numerator += xDiff * yDiff;
+		xDenominator += xDiff ** 2;
+		yDenominator += yDiff ** 2;
+	}
+
+	const denominator = Math.sqrt(xDenominator * yDenominator);
+	if (!denominator) {
+		return 0;
+	}
+
+	return numerator / denominator;
+}
+
+function linearRegression(xValues, yValues) {
+	if (!xValues.length || xValues.length !== yValues.length) {
+		return { slope: 0, intercept: 0, rSquared: 0 };
+	}
+
+	const xMean = mean(xValues);
+	const yMean = mean(yValues);
+
+	let numerator = 0;
+	let denominator = 0;
+
+	for (let index = 0; index < xValues.length; index += 1) {
+		const xDiff = xValues[index] - xMean;
+		numerator += xDiff * (yValues[index] - yMean);
+		denominator += xDiff ** 2;
+	}
+
+	const slope = denominator ? numerator / denominator : 0;
+	const intercept = yMean - slope * xMean;
+	const r = pearsonCorr(xValues, yValues);
+
+	return {
+		slope,
+		intercept,
+		rSquared: r ** 2,
+	};
+}
+
+function correlationInterpretation(rValue) {
+	const magnitude = Math.abs(rValue);
+	const strength = magnitude >= 0.7 ? "Strong" : magnitude >= 0.4 ? "Moderate" : "Weak";
+	const direction = rValue > 0 ? "Positive" : rValue < 0 ? "Negative" : "Neutral";
+	return `${strength} ${direction}`;
+}
+
+function formatNumber(value, decimals = 2) {
+	return Number(value).toFixed(decimals);
+}
+
+function formatCurrency(value) {
+	if (value === null || value === undefined || Number.isNaN(value)) {
+		return "N/A";
+	}
+	return `$${Number(value).toFixed(0)}`;
+}
+
+function getFilteredSortedRows() {
+	const filterInput = document.getElementById("filterInput");
+	const sortSelect = document.getElementById("sortSelect");
+
+	const query = (filterInput?.value || "").trim().toLowerCase();
+	const sortKey = sortSelect?.value || "";
+
+	let rows = [...window.ds];
+
+	if (query) {
+		rows = rows.filter((row) =>
+			[row.country, row.variety, row.winery, row.title, row.province, row.description].some((value) =>
+				String(value).toLowerCase().includes(query)
+			)
+		);
+	}
+
+	if (sortKey === "points") {
+		rows.sort((a, b) => (b.points ?? -Infinity) - (a.points ?? -Infinity));
+	} else if (sortKey === "price") {
+		rows.sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
+	} else if (sortKey === "country") {
+		rows.sort((a, b) => a.country.localeCompare(b.country));
+	} else if (sortKey === "variety") {
+		rows.sort((a, b) => a.variety.localeCompare(b.variety));
+	}
+
+	return rows;
+}
+
+function updateRowCount(viewLength, totalLength = window.ds.length) {
+	const rowCountElement = document.getElementById("rowCount");
+	if (!rowCountElement) {
+		return;
+	}
+	rowCountElement.textContent = `${viewLength.toLocaleString()} rows${totalLength !== viewLength ? ` of ${totalLength.toLocaleString()}` : ""}`;
+}
+
+function renderTable(rows) {
+	const tbody = document.getElementById("tableBody");
+	if (!tbody) {
+		return 0;
+	}
+
+	tbody.innerHTML = "";
+
+	if (!rows.length) {
+		tbody.innerHTML =
+			'<tr><td colspan="7" style="text-align:center;padding:22px;color:#5f6472;">No results found.</td></tr>';
+		updateRowCount(0, window.ds.length);
+		window.dsView = [];
+		return 0;
+	}
+
+	const visibleRows = rows.slice(0, 300);
+	window.dsView = visibleRows;
+	updateRowCount(visibleRows.length, rows.length);
+
+	const fragment = document.createDocumentFragment();
+	for (let index = 0; index < visibleRows.length; index += 1) {
+		const row = visibleRows[index];
+		const tr = document.createElement("tr");
+		tr.innerHTML = `
+			<td>${index + 1}</td>
+			<td>${row.country}</td>
+			<td>${row.variety}</td>
+			<td>${row.winery}</td>
+			<td>${row.points ?? "N/A"}</td>
+			<td>${formatCurrency(row.price)}</td>
+			<td>${row.province}</td>
+		`;
+		fragment.appendChild(tr);
+	}
+
+	tbody.appendChild(fragment);
+	return visibleRows.length;
+}
+
+function applyFilterSort() {
+	const rows = getFilteredSortedRows();
+	const shown = renderTable(rows);
+	updateSummary(rows, shown);
+}
+
+function resetTable() {
+	const filterInput = document.getElementById("filterInput");
+	const sortSelect = document.getElementById("sortSelect");
+	if (filterInput) {
+		filterInput.value = "";
+	}
+	if (sortSelect) {
+		sortSelect.value = "";
+	}
+	const shown = renderTable(window.ds);
+	updateSummary(window.ds, shown);
+}
+
+window.applyFilterSort = applyFilterSort;
+window.resetTable = resetTable;
+
+function renderAnalysis(rows) {
+	const points = rows.map((row) => row.points).filter((value) => value !== null);
+	const pricedRows = rows.filter((row) => row.price !== null && row.price > 0 && row.points !== null);
+	const prices = pricedRows.map((row) => row.price);
+	const pricedPoints = pricedRows.map((row) => row.points);
+	const descRows = rows.filter((row) => row.points !== null);
+	const descriptionLengths = descRows.map((row) => row.description.length);
+	const descPoints = descRows.map((row) => row.points);
+
+	let minScore = 0;
+	let maxScore = 0;
+	if (points.length) {
+		minScore = points[0];
+		maxScore = points[0];
+		for (let index = 1; index < points.length; index += 1) {
+			const value = points[index];
+			if (value < minScore) {
+				minScore = value;
+			}
+			if (value > maxScore) {
+				maxScore = value;
+			}
+		}
+	}
+	const scoreVariance = variance(points);
+	const scoreStdDev = stdDev(points);
+
+	const rPricePoints = pearsonCorr(prices, pricedPoints);
+	const rDescPoints = pearsonCorr(descriptionLengths, descPoints);
+	const regression = linearRegression(prices, pricedPoints);
+
+	const stronger = Math.abs(rPricePoints) >= Math.abs(rDescPoints) ? "Price" : "Description Length";
+	const direction =
+		rPricePoints > 0 && rDescPoints > 0
+			? "Both positive"
+			: rPricePoints < 0 && rDescPoints < 0
+				? "Both negative"
+				: "Mixed";
+
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.textContent = value;
+		}
+	};
+
+	setText("an", points.length.toLocaleString());
+	setText("aMin", String(minScore));
+	setText("aMax", String(maxScore));
+	setText("aRange", String(maxScore - minScore));
+	setText("aVariance", formatNumber(scoreVariance));
+	setText("aStdDev", formatNumber(scoreStdDev));
+
+	setText("rPearson", formatNumber(rPricePoints, 4));
+	setText("rInterp", correlationInterpretation(rPricePoints));
+	setText("rPearson2", formatNumber(rDescPoints, 4));
+	setText("rInterp2", correlationInterpretation(rDescPoints));
+	setText("rStronger", stronger);
+	setText("rDirection", direction);
+
+	setText("regEquation", `score = ${formatNumber(regression.slope, 4)}*price + ${formatNumber(regression.intercept, 4)}`);
+	setText("regSlope", formatNumber(regression.slope, 4));
+	setText("regIntercept", formatNumber(regression.intercept, 4));
+	setText("regR2", formatNumber(regression.rSquared, 4));
+	setText("regInterp", regression.rSquared >= 0.9 ? "Excellent fit" : regression.rSquared >= 0.7 ? "Good fit" : "Weak fit");
+	setText("regPredict", formatNumber(regression.slope * 50 + regression.intercept, 1));
+}
+
+function renderInsights(rows) {
+	const points = rows.map((row) => row.points).filter((value) => value !== null);
+	const pricedRows = rows.filter((row) => row.price !== null && row.price > 0 && row.points !== null);
+	const prices = pricedRows.map((row) => row.price);
+	const pricedPoints = pricedRows.map((row) => row.points);
+	const descRows = rows.filter((row) => row.points !== null);
+	const descriptionLengths = descRows.map((row) => row.description.length);
+	const descPoints = descRows.map((row) => row.points);
+
+	const avgScore = mean(points);
+	const priceCorr = pearsonCorr(prices, pricedPoints);
+	const descCorr = pearsonCorr(descriptionLengths, descPoints);
+	const strongestLabel =
+		Math.abs(priceCorr) >= Math.abs(descCorr)
+			? "price"
+			: "description length";
+	const regression = linearRegression(prices, pricedPoints);
+	const predictedAt50 = regression.slope * 50 + regression.intercept;
+	const expensiveShare =
+		rows.length > 0
+			? (rows.filter((row) => row.price !== null && row.price >= 50).length / rows.length) * 100
+			: 0;
+
+	const topCountry = topEntries(countBy(rows, (row) => row.country), 1)[0]?.[0] || "N/A";
+
+	const insightsBody = document.getElementById("insightsBody");
+	if (!insightsBody) {
+		return;
+	}
+
+	insightsBody.innerHTML = `
+		<p class="insight-text">
+			The loaded dataset contains <span class="highlight">${rows.length.toLocaleString()}</span> reviews with a mean score of
+			<span class="highlight">${formatNumber(avgScore, 2)}</span>. The strongest measured linear signal in this report is
+			<span class="highlight">${strongestLabel}</span>, while the price-to-score correlation is
+			<span class="highlight">${formatNumber(priceCorr, 4)}</span>. The regression model projects a score near
+			<span class="highlight">${formatNumber(predictedAt50, 1)}</span> for wines priced around $50, which is best interpreted as a broad trend, not a guarantee.
+			The largest share of reviews comes from <span class="highlight">${topCountry}</span>, and about
+			<span class="highlight">${formatNumber(expensiveShare, 1)}%</span> of entries are priced at $50 or above.
+		</p>
+	`;
+}
+
+function updateSummary(rows, shownCount = rows.length) {
 	const total = rows.length;
 	const prices = rows.map((row) => row.price).filter((value) => value !== null).sort((a, b) => a - b);
 	const points = rows.map((row) => row.points).filter((value) => value !== null);
-	const countries = new Set(rows.map((row) => row.country));
 	const topVariety = topEntries(countBy(rows, (row) => row.variety), 1)[0]?.[0] || "N/A";
 
 	const avgScore =
@@ -182,7 +488,7 @@ function updateSummary(rows) {
 	document.getElementById("metricTotal").textContent = total.toLocaleString();
 	document.getElementById("metricAvgScore").textContent = avgScore;
 	document.getElementById("metricMedianPrice").textContent = medianPrice ? `$${medianPrice}` : "N/A";
-	document.getElementById("metricCountries").textContent = countries.size.toLocaleString();
+	document.getElementById("metricCountries").textContent = Number(shownCount || 0).toLocaleString();
 	document.getElementById("metricTopVariety").textContent = topVariety;
 }
 
@@ -608,6 +914,18 @@ function renderFlavorLexicon(rows) {
 }
 
 function revealPanels() {
+	const datasetSection = document.getElementById("datasetSection");
+	const vizHeader = document.getElementById("vizHeader");
+	const analysisSection = document.getElementById("analysisSection");
+	if (datasetSection) {
+		datasetSection.classList.remove("hidden");
+	}
+	if (vizHeader) {
+		vizHeader.classList.remove("hidden");
+	}
+	if (analysisSection) {
+		analysisSection.classList.remove("hidden");
+	}
 	document.getElementById("summaryPanel").classList.remove("hidden");
 	document.getElementById("dashboard").classList.remove("hidden");
 }
@@ -732,7 +1050,6 @@ function setupVisualizationModal() {
 }
 
 function renderDashboard(rows) {
-	updateSummary(rows);
 	renderCountryVolume(rows);
 	renderCountryQuality(rows);
 	renderPriceDistribution(rows);
@@ -753,7 +1070,9 @@ async function loadSelectedDataset() {
 	const selectedPath = datasetSelect?.value || DATASET_FALLBACKS[0];
 	const candidatePaths = [selectedPath, ...DATASET_FALLBACKS.filter((path) => path !== selectedPath)];
 
-	button.disabled = true;
+	if (button) {
+		button.disabled = true;
+	}
 	setStatus("Loading dataset and preparing visualizations...");
 
 	try {
@@ -777,6 +1096,10 @@ async function loadSelectedDataset() {
 		window.ds = cleanRows;
 
 		renderDashboard(cleanRows);
+		const shown = renderTable(cleanRows);
+		updateSummary(cleanRows, shown);
+		renderAnalysis(cleanRows);
+		renderInsights(cleanRows);
 		setStatus(
 			`Dashboard ready: ${cleanRows.length.toLocaleString()} rows loaded from ${loaded.path.replace("./datasets/", "")}.`,
 			"success"
@@ -794,7 +1117,9 @@ async function loadSelectedDataset() {
 		window.ds = [];
 		setStatus(`Could not build dashboard: ${error.message}`, "error");
 	} finally {
-		button.disabled = false;
+		if (button) {
+			button.disabled = false;
+		}
 	}
 }
 
@@ -823,7 +1148,43 @@ function setupOpeningLoader() {
 
 document.addEventListener("DOMContentLoaded", () => {
 	const button = document.getElementById("loadButton");
-	button.addEventListener("click", loadSelectedDataset);
+	if (button) {
+		button.addEventListener("click", loadSelectedDataset);
+	}
+
+	const filterInput = document.getElementById("filterInput");
+	if (filterInput) {
+		let filterTimer = null;
+		filterInput.addEventListener("input", () => {
+			if (!window.ds.length) {
+				return;
+			}
+			if (filterTimer) {
+				window.clearTimeout(filterTimer);
+			}
+			filterTimer = window.setTimeout(() => {
+				applyFilterSort();
+			}, 120);
+		});
+
+		filterInput.addEventListener("keydown", (event) => {
+			if (event.key === "Enter") {
+				event.preventDefault();
+				applyFilterSort();
+			}
+		});
+	}
+
+	const sortSelect = document.getElementById("sortSelect");
+	if (sortSelect) {
+		sortSelect.addEventListener("change", () => {
+			if (!window.ds.length) {
+				return;
+			}
+			applyFilterSort();
+		});
+	}
+
 	setupOpeningLoader();
 	setupVisualizationModal();
 	setStatus("Pick a dataset and generate your visual dashboard.");
