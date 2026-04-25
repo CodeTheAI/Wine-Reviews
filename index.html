@@ -1,4 +1,9 @@
 <!doctype html>
+<!-- 
+Wine Atlas - Review Intelligence Dashboard
+An interactive data visualization platform for wine review analysis.
+Provides insights into review trends, quality metrics, and flavor profiles across datasets.
+-->
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -13,6 +18,7 @@
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body class="intro-active">
+		<!-- Opening loader animation with truck and decorative elements -->
 		<div id="openingLoader" class="opening-loader" aria-hidden="true">
 			<div class="loader">
 				<div class="truckWrapper">
@@ -36,11 +42,13 @@
 			</div>
 		</div>
 
+		<!-- Background decorative elements: animated orbs and grid pattern -->
 		<div class="bg-orb bg-orb-a" aria-hidden="true"></div>
 		<div class="bg-orb bg-orb-b" aria-hidden="true"></div>
 		<div class="bg-grid" aria-hidden="true"></div>
 
 		<main class="page">
+			<!-- Hero section with introduction and dataset selection controls -->
 			<section class="hero">
 				<p class="eyebrow">Editorial Data Science Report</p>
 				<h1>Wine Atlas Dashboard</h1>
@@ -50,6 +58,7 @@
 					and review generated insights.
 				</p>
 
+				<!-- Dataset selector and generate button -->
 				<div class="controls" role="group" aria-label="Dataset controls">
 					<label for="datasetSelect" class="sr-only">Choose dataset</label>
 					<select id="datasetSelect" aria-label="Dataset file selection">
@@ -62,10 +71,18 @@
 				<p id="status" class="status">Ready when you are.</p>
 			</section>
 
+<<<<<<< HEAD
 			<section class="dataset-section hidden" id="datasetSection">
 				<div class="section-title-wrap">
 					<h2 class="section-title">01. Dataset Explorer</h2>
 					<p class="section-sub">Filter, sort, and inspect rows from the selected wine dataset.</p>
+=======
+			<!-- Summary statistics panel: displays key metrics from the loaded dataset -->
+			<section id="summaryPanel" class="summary-panel hidden" aria-live="polite">
+				<div class="metric-card">
+					<p class="metric-label">Total Reviews</p>
+					<p id="metricTotal" class="metric-value">-</p>
+>>>>>>> 2b7b8b225bf850a5d3b17858420d405ee23eec39
 				</div>
 
 				<div class="table-controls" role="group" aria-label="Table controls">

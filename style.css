@@ -1,3 +1,5 @@
+/* ===== DESIGN TOKENS & COLOR SYSTEM ===== */
+/* Custom properties for consistent theming throughout the application */
 :root {
 	--bg-top: #f5ead9;
 	--bg-mid: #efe2cf;
@@ -16,6 +18,8 @@
 	--shadow-md: 0 10px 26px rgba(28, 29, 34, 0.11);
 }
 
+/* ===== GLOBAL STYLES & RESET ===== */
+/* Base element styles and general layout rules */
 * {
 	box-sizing: border-box;
 }
@@ -36,6 +40,8 @@ body {
 
 body.intro-active {
 	overflow: hidden;
+/* ===== OPENING LOADER: Animated truck delivery introduction ===== */
+/* Full-screen splash animation on page load */
 }
 
 .opening-loader {
@@ -156,6 +162,8 @@ body.intro-active {
 		transform: translateX(0px);
 	}
 	100% {
+/* ===== BACKGROUND ELEMENTS: Decorative animated orbs and grid ===== */
+/* Animated orb elements for visual depth */
 		transform: translateX(-350px);
 	}
 }
@@ -210,10 +218,6 @@ body.intro-active {
 	transition: filter 220ms ease, transform 220ms ease;
 }
 
-body.modal-open .page {
-	filter: blur(7px) saturate(0.9);
-	transform: scale(0.995);
-}
 
 .hero {
 	padding: 1.4rem clamp(1rem, 3.2vw, 2.2rem) 1.2rem;
@@ -251,6 +255,8 @@ h1 {
 	color: var(--ink-700);
 }
 
+/* ===== CONTROLS: Dataset selection and generate button ===== */
+/* Dropdown and button styling for dataset interaction */
 .controls {
 	margin-top: 1.1rem;
 	display: grid;
@@ -270,6 +276,7 @@ button {
 	padding: 0 1rem;
 }
 
+/* Select dropdown styling */
 select {
 	background: rgba(255, 255, 255, 0.9);
 	border: 1px solid rgba(34, 37, 43, 0.18);
@@ -277,6 +284,7 @@ select {
 	box-shadow: var(--shadow-md);
 }
 
+/* Primary action button */
 button {
 	background: linear-gradient(120deg, var(--accent-a), var(--accent-b));
 	color: var(--cream);
@@ -297,6 +305,7 @@ button:disabled {
 	opacity: 0.78;
 }
 
+/* Status message display with tone indicators */
 .status {
 	margin: 0.85rem 0 0;
 	font-weight: 700;
@@ -310,6 +319,8 @@ button:disabled {
 
 .status.success {
 	color: #0b756f;
+/* ===== SUMMARY PANEL: Key statistics display ===== */
+/* Container for summary metric cards */
 }
 
 .section-title-wrap {
@@ -410,6 +421,7 @@ tbody tr:hover {
 	gap: 0.8rem;
 }
 
+/* Individual metric card styling */
 .metric-card {
 	padding: 0.85rem 1rem;
 	background: var(--card);
@@ -438,10 +450,9 @@ tbody tr:hover {
 	color: #1f2026;
 }
 
-.viz-grid {
+.viz-dashboard {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 0.95rem;
+	gap: 2.4rem;
 }
 
 .analysis-section {
@@ -541,13 +552,17 @@ tbody tr:hover {
 	background: var(--card);
 	border: 1px solid var(--edge);
 	border-radius: 22px;
-	padding: 1rem;
+	padding: 1.2rem;
 	box-shadow: var(--shadow-md);
 	backdrop-filter: blur(4px);
 	opacity: 0;
 	transform: translateY(10px);
 	animation: revealUp 580ms ease forwards;
-	cursor: zoom-in;
+	display: flex;
+	flex-direction: column;
+	gap: 0.8rem;
+	min-height: 0;
+	overflow: visible;
 }
 
 .viz-card:nth-child(2n) {
@@ -562,30 +577,62 @@ tbody tr:hover {
 	grid-column: span 2;
 }
 
-.viz-card h2 {
+.viz-card h2,
+.viz-card h3 {
 	margin: 0;
 	font-family: "Fraunces", serif;
-	font-size: clamp(1.15rem, 2.2vw, 1.55rem);
-	line-height: 1.1;
+	font-size: clamp(1.12rem, 2vw, 1.4rem);
+	line-height: 1.15;
 	color: #202028;
 }
 
 .viz-card p {
-	margin: 0.36rem 0 0.7rem;
-	font-size: 0.95rem;
+	margin: 0;
+	font-size: 0.92rem;
 	line-height: 1.45;
 	color: var(--ink-700);
 	max-width: 64ch;
+	flex-shrink: 0;
 }
 
 .chart {
-	width: 100%;
-	height: 340px;
-	border-radius: 14px;
-	overflow: hidden;
-	border: 1px solid rgba(28, 29, 34, 0.08);
+	width: calc(100% + 2rem);
+	margin-left: -1rem;
+	margin-right: -1rem;
+	margin-bottom: -1rem;
+	height: 400px;
+	border-radius: 0 0 14px 14px;
+	overflow: visible;
+	flex: 1;
+	border: none;
+	border-top: 1px solid rgba(28, 29, 34, 0.08);
 	background: rgba(255, 254, 252, 0.7);
-	cursor: zoom-in;
+}
+
+.section-group {
+	display: grid;
+	gap: 1.2rem;
+}
+
+.section-title {
+	margin: 0;
+	font-family: "Fraunces", serif;
+	font-size: clamp(1.4rem, 2.8vw, 1.95rem);
+	line-height: 1.1;
+	color: #1a1d24;
+	padding-bottom: 0.4rem;
+	border-bottom: 2px solid var(--edge);
+	letter-spacing: 0.01em;
+}
+
+.viz-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 2.4rem;
+}
+
+.viz-grid .viz-card {
+	width: 100%;
 }
 
 .viz-modal {
@@ -597,11 +644,11 @@ tbody tr:hover {
 	justify-content: center;
 	padding: 1rem;
 	background: rgba(13, 17, 24, 0.33);
-	backdrop-filter: blur(2px);
 }
 
 .viz-modal.open {
 	display: flex;
+	backdrop-filter: blur(2px);
 }
 
 .viz-modal-panel {
@@ -615,6 +662,9 @@ tbody tr:hover {
 	display: grid;
 	grid-template-rows: auto 1fr;
 	animation: cardEntrance 180ms ease-out;
+	position: relative;
+	z-index: 61;
+	backdrop-filter: none;
 }
 
 .viz-modal-header {
@@ -659,10 +709,14 @@ tbody tr:hover {
 	background: rgba(255, 252, 247, 0.75);
 }
 
+/* ===== UTILITIES & HELPERS ===== */
+/* Utility classes for common states and accessibility */
 .hidden {
 	display: none;
 }
 
+/* ===== ACCESSIBILITY: Screen reader and utility classes ===== */
+/* Screen reader only - visually hidden but accessible */
 .sr-only {
 	position: absolute;
 	width: 1px;
@@ -675,6 +729,7 @@ tbody tr:hover {
 	border: 0;
 }
 
+/* Panel reveal animation - smooth fade and slide sequence */
 @keyframes revealUp {
 	to {
 		opacity: 1;
@@ -716,16 +771,33 @@ tbody tr:hover {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 
+<<<<<<< HEAD
 	.analysis-grid {
 		grid-template-columns: 1fr;
+=======
+	.viz-dashboard {
+		gap: 1.8rem;
+	}
+
+	.section-title {
+		font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+>>>>>>> 2b7b8b225bf850a5d3b17858420d405ee23eec39
 	}
 
 	.viz-grid {
 		grid-template-columns: 1fr;
 	}
 
+	.viz-grid .viz-card {
+		max-width: 100%;
+	}
+
 	.viz-card.wide {
 		grid-column: auto;
+	}
+
+	.chart {
+		height: 520px;
 	}
 }
 

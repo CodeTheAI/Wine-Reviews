@@ -1,8 +1,10 @@
+// Dataset configuration and fallback paths for loading CSV data
 const DATASET_FALLBACKS = [
 	"./datasets/winemag-data-130k-v2.csv",
 	"./datasets/winemag-data_first150k.csv",
 ];
 
+// Color palette for consistent visualization styling across all charts
 const PLOT_COLORS = [
 	"#8B1E2C",
 	"#D26639",
@@ -14,8 +16,11 @@ const PLOT_COLORS = [
 	"#9C3F64",
 ];
 
+// Global dataset storage - holds all cleaned and processed wine review data
 window.ds = [];
 window.dsView = [];
+
+// ===== UTILITY FUNCTIONS: Data Type Conversion & Validation =====
 
 function toNumber(value) {
 	const number = Number(value);
@@ -30,6 +35,7 @@ function normalizeText(value, fallback = "Unknown") {
 	return text ? text : fallback;
 }
 
+// Updates the status message displayed to the user with optional styling tone
 function setStatus(message, tone = "") {
 	const statusElement = document.getElementById("status");
 	if (!statusElement) {
@@ -41,6 +47,8 @@ function setStatus(message, tone = "") {
 		statusElement.classList.add(tone);
 	}
 }
+
+// ===== CSV PARSING: Load and parse CSV data from URLs =====
 
 function parseCsv(url) {
 	return (async () => {
@@ -101,6 +109,8 @@ function parseCsv(url) {
 	})();
 }
 
+// ===== DATA AGGREGATION & STATISTICS: Helper functions for data analysis =====
+
 function countBy(rows, accessor) {
 	const map = new Map();
 	for (const row of rows) {
@@ -110,10 +120,12 @@ function countBy(rows, accessor) {
 	return map;
 }
 
+// Returns the top N entries from a Map sorted by value in descending order
 function topEntries(map, limit = 10) {
 	return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
 }
 
+// Calculates the percentile value from a sorted array (q: 0-1, where 0.5 is median)
 function percentile(sortedValues, q) {
 	if (!sortedValues.length) {
 		return null;
@@ -121,6 +133,9 @@ function percentile(sortedValues, q) {
 	const position = (sortedValues.length - 1) * q;
 	const base = Math.floor(position);
 	const rest = position - base;
+// ===== CHART CONFIGURATION: Plotly layout and styling functions =====
+
+// Standard chart layout configuration with consistent title and axis styling
 	const next = sortedValues[base + 1] !== undefined ? sortedValues[base + 1] : sortedValues[base];
 	return sortedValues[base] + rest * (next - sortedValues[base]);
 }
@@ -133,7 +148,7 @@ function chartLayout(title) {
 			xanchor: "left",
 			font: { family: "Fraunces, serif", size: 20, color: "#23252c" },
 		},
-		margin: { l: 52, r: 25, t: 58, b: 46 },
+		margin: { l: 140, r: 25, t: 58, b: 46 },
 		paper_bgcolor: "rgba(0,0,0,0)",
 		plot_bgcolor: "rgba(255,255,255,0.68)",
 		font: { family: "Manrope, sans-serif", color: "#2f3542" },
@@ -145,6 +160,13 @@ function chartLayout(title) {
 			gridcolor: "rgba(40, 44, 52, 0.08)",
 			zerolinecolor: "rgba(40, 44, 52, 0.14)",
 		},
+	};
+}
+
+function chartConfig() {
+	return {
+		responsive: true,
+		displayModeBar: false,
 	};
 }
 
@@ -168,6 +190,7 @@ function sanitizeRows(rows) {
 	}));
 }
 
+<<<<<<< HEAD
 function mean(values) {
 	if (!values.length) {
 		return 0;
@@ -474,6 +497,11 @@ function renderInsights(rows) {
 }
 
 function updateSummary(rows, shownCount = rows.length) {
+=======
+// ===== SUMMARY METRICS: Calculate and display key statistics =====
+
+function updateSummary(rows) {
+>>>>>>> 2b7b8b225bf850a5d3b17858420d405ee23eec39
 	const total = rows.length;
 	const prices = rows.map((row) => row.price).filter((value) => value !== null).sort((a, b) => a - b);
 	const points = rows.map((row) => row.points).filter((value) => value !== null);
@@ -492,6 +520,9 @@ function updateSummary(rows, shownCount = rows.length) {
 	document.getElementById("metricTopVariety").textContent = topVariety;
 }
 
+// ===== CHART RENDERING: Individual visualization functions =====
+
+// Review volume by country - horizontal bar chart
 function renderCountryVolume(rows) {
 	const topCountries = topEntries(countBy(rows, (row) => row.country), 14).reverse();
 	Plotly.react(
@@ -509,10 +540,12 @@ function renderCountryVolume(rows) {
 				hovertemplate: "%{y}<br>Reviews: %{x:,}<extra></extra>",
 			},
 		],
-		chartLayout("Review Volume By Country")
+		chartLayout("Review Volume By Country"),
+		chartConfig()
 	);
 }
 
+// Quality rankings by country - average score comparison
 function renderCountryQuality(rows) {
 	const accumulator = new Map();
 	for (const row of rows) {
@@ -553,10 +586,12 @@ function renderCountryQuality(rows) {
 					"%{y}<br>Avg score: %{x}<br>Reviews: %{customdata:,}<extra></extra>",
 			},
 		],
-		chartLayout("Average Score Leaders")
+		chartLayout("Average Score Leaders"),
+		chartConfig()
 	);
 }
 
+// Price distribution histogram - shows bottle price spread
 function renderPriceDistribution(rows) {
 	const prices = rows
 		.map((row) => row.price)
@@ -580,10 +615,12 @@ function renderPriceDistribution(rows) {
 			...chartLayout("Price Distribution (0-400 USD)"),
 			xaxis: { title: "Price (USD)", gridcolor: "rgba(40, 44, 52, 0.08)" },
 			yaxis: { title: "Review count", gridcolor: "rgba(40, 44, 52, 0.08)" },
-		}
+		},
+		chartConfig()
 	);
 }
 
+// Expert rating distribution - where most scores cluster
 function renderScoreDistribution(rows) {
 	const points = rows.map((row) => row.points).filter((pointsValue) => pointsValue !== null);
 
@@ -605,10 +642,12 @@ function renderScoreDistribution(rows) {
 			...chartLayout("Score Distribution"),
 			xaxis: { title: "Points", gridcolor: "rgba(40, 44, 52, 0.08)" },
 			yaxis: { title: "Review count", gridcolor: "rgba(40, 44, 52, 0.08)" },
-		}
+		},
+		chartConfig()
 	);
 }
 
+// Price vs score scatter plot - analyze correlation between price and ratings
 function renderPriceScoreScatter(rows) {
 	const pointsWithPrice = rows.filter(
 		(row) => row.price !== null && row.price > 0 && row.price <= 350 && row.points !== null
@@ -652,10 +691,12 @@ function renderPriceScoreScatter(rows) {
 			...chartLayout("Price vs Score Relationship"),
 			xaxis: { title: "Price (USD)", gridcolor: "rgba(40, 44, 52, 0.08)" },
 			yaxis: { title: "Points", gridcolor: "rgba(40, 44, 52, 0.08)" },
-		}
+		},
+		chartConfig()
 	);
 }
 
+// Most reviewed grape varieties - treemap visualization
 function renderVarietyTreemap(rows) {
 	const topVarieties = topEntries(countBy(rows, (row) => row.variety), 25);
 
@@ -678,9 +719,11 @@ function renderVarietyTreemap(rows) {
 		{
 			...chartLayout("Most Reviewed Varieties"),
 			margin: { l: 15, r: 15, t: 54, b: 10 },
-		}
+		},
+		chartConfig()
 	);
 }
+// Most frequently reviewed wineries
 
 function renderWineryLeaders(rows) {
 	const topWineries = topEntries(countBy(rows, (row) => row.winery), 16).reverse();
@@ -700,10 +743,12 @@ function renderWineryLeaders(rows) {
 				hovertemplate: "%{y}<br>Reviews: %{x:,}<extra></extra>",
 			},
 		],
-		chartLayout("Top Wineries By Review Count")
+		chartLayout("Top Wineries By Review Count"),
+		chartConfig()
 	);
 }
 
+// Price range comparison across top wine-producing countries
 function renderPriceByCountry(rows) {
 	const countryCounts = topEntries(countBy(rows, (row) => row.country), 8).map((entry) => entry[0]);
 	const traces = countryCounts.map((country, index) => {
@@ -730,9 +775,11 @@ function renderPriceByCountry(rows) {
 			...chartLayout("Price Spread Across Major Countries"),
 			xaxis: { title: "Country", gridcolor: "rgba(40, 44, 52, 0.08)" },
 			yaxis: { title: "Price (USD)", gridcolor: "rgba(40, 44, 52, 0.08)" },
-		}
+		},
+		chartConfig()
 	);
 }
+// Score banding - visualize rating tiers
 
 function renderScoreBands(rows) {
 	const bands = {
@@ -778,9 +825,11 @@ function renderScoreBands(rows) {
 			margin: { l: 25, r: 25, t: 58, b: 25 },
 			showlegend: true,
 			legend: { orientation: "h", y: -0.08 },
-		}
+		},
+		chartConfig()
 	);
 }
+// Value index - price-to-score ratio analysis
 
 function renderValueIndex(rows) {
 	const groups = new Map();
@@ -831,9 +880,11 @@ function renderValueIndex(rows) {
 					"%{y}<br>Value index: %{x}<br>Samples: %{customdata:,}<extra></extra>",
 			},
 		],
-		chartLayout("Value Index (Score Per Dollar)")
+		chartLayout("Value Index (Score Per Dollar)"),
+		chartConfig()
 	);
 }
+// Flavor descriptors word cloud - analyze review language patterns
 
 function renderFlavorLexicon(rows) {
 	const stopWords = new Set([
@@ -909,9 +960,12 @@ function renderFlavorLexicon(rows) {
 				hovertemplate: "%{y}<br>Mentions: %{x:,}<extra></extra>",
 			},
 		],
-		chartLayout("Most Frequent Descriptive Terms")
+		chartLayout("Most Frequent Descriptive Terms"),
+		chartConfig()
 	);
 }
+
+// ===== UI INTERACTIONS: Modal and panel management =====
 
 function revealPanels() {
 	const datasetSection = document.getElementById("datasetSection");
@@ -937,6 +991,7 @@ function clonePlotObject(value) {
 	return JSON.parse(JSON.stringify(value));
 }
 
+// Opens detailed visualization modal with expanded chart
 function openVisualizationModal(card) {
 	const modal = document.getElementById("vizModal");
 	const modalTitle = document.getElementById("vizModalTitle");
@@ -990,6 +1045,7 @@ function openVisualizationModal(card) {
 	});
 }
 
+// Closes the expanded visualization modal
 function closeVisualizationModal() {
 	const modal = document.getElementById("vizModal");
 	const modalChart = document.getElementById("modalChart");
@@ -1007,12 +1063,13 @@ function closeVisualizationModal() {
 	}
 }
 
+// Initializes modal click handlers and keyboard interactions
 function setupVisualizationModal() {
 	const dashboard = document.getElementById("dashboard");
 	const modal = document.getElementById("vizModal");
 	const closeButton = document.getElementById("closeVizModal");
 
-	if (!dashboard || !modal || !closeButton) {
+	if (!modal || !closeButton) {
 		return;
 	}
 
@@ -1049,7 +1106,64 @@ function setupVisualizationModal() {
 	});
 }
 
+// ===== CHART MANAGEMENT: Purge and initialize all chart elements =====
+
+// Removes all existing Plotly charts from the DOM
+function purgeAllCharts() {
+	const chartIds = [
+		"countryVolumeChart",
+		"countryQualityChart",
+		"priceDistributionChart",
+		"scoreDistributionChart",
+		"priceScoreScatterChart",
+		"varietyTreemapChart",
+		"wineryLeadersChart",
+		"priceByCountryChart",
+		"scoreBandsChart",
+		"valueIndexChart",
+		"flavorLexiconChart",
+	];
+
+	for (const chartId of chartIds) {
+		const element = document.getElementById(chartId);
+		if (element) {
+			Plotly.purge(element);
+		}
+	}
+}
+
+function resizeAllCharts() {
+	const chartIds = [
+		"countryVolumeChart",
+		"countryQualityChart",
+		"priceDistributionChart",
+		"scoreDistributionChart",
+		"priceScoreScatterChart",
+		"varietyTreemapChart",
+		"wineryLeadersChart",
+		"priceByCountryChart",
+		"scoreBandsChart",
+		"valueIndexChart",
+		"flavorLexiconChart",
+	];
+
+	for (const chartId of chartIds) {
+		const element = document.getElementById(chartId);
+		if (element) {
+			Plotly.Plots.resize(element);
+		}
+// ===== MAIN DASHBOARD RENDERER: Orchestrates all visualizations =====
+
+// Purges old charts, updates summary, and renders all visualizations
+	}
+}
+
 function renderDashboard(rows) {
+<<<<<<< HEAD
+=======
+	purgeAllCharts();
+	updateSummary(rows);
+>>>>>>> 2b7b8b225bf850a5d3b17858420d405ee23eec39
 	renderCountryVolume(rows);
 	renderCountryQuality(rows);
 	renderPriceDistribution(rows);
@@ -1062,6 +1176,13 @@ function renderDashboard(rows) {
 	renderValueIndex(rows);
 	renderFlavorLexicon(rows);
 	revealPanels();
+	requestAnimationFrame(() => {
+		setTimeout(resizeAllCharts, 100);
+// ===== DATASET LOADING & INITIALIZATION =====
+
+// Main function: Loads selected dataset, sanitizes it, and renders dashboard
+// Hides old visualizations when switching datasets to match initial page load behavior
+	});
 }
 
 async function loadSelectedDataset() {
@@ -1070,9 +1191,16 @@ async function loadSelectedDataset() {
 	const selectedPath = datasetSelect?.value || DATASET_FALLBACKS[0];
 	const candidatePaths = [selectedPath, ...DATASET_FALLBACKS.filter((path) => path !== selectedPath)];
 
+<<<<<<< HEAD
 	if (button) {
 		button.disabled = true;
 	}
+=======
+	button.disabled = true;
+	// Hide the old visualization cards before loading new dataset, matching the initial page load behavior
+	document.getElementById("summaryPanel").classList.add("hidden");
+	document.getElementById("dashboard").classList.add("hidden");
+>>>>>>> 2b7b8b225bf850a5d3b17858420d405ee23eec39
 	setStatus("Loading dataset and preparing visualizations...");
 
 	try {
@@ -1121,6 +1249,9 @@ async function loadSelectedDataset() {
 			button.disabled = false;
 		}
 	}
+// ===== SETUP FUNCTIONS: Initialize page elements and event listeners =====
+
+// Initializes the opening loader animation sequence
 }
 
 window.loadDataset = loadSelectedDataset;
@@ -1143,6 +1274,7 @@ function setupOpeningLoader() {
 			return;
 		}
 		openingLoader.remove();
+// Initializes the page when DOM is fully loaded
 	});
 }
 
