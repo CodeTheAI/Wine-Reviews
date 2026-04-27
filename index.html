@@ -1,229 +1,328 @@
 <!doctype html>
-<!-- 
+<!--
 Wine Atlas - Review Intelligence Dashboard
 An interactive data visualization platform for wine review analysis.
 Provides insights into review trends, quality metrics, and flavor profiles across datasets.
 -->
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Wine Atlas | Complete Analytics Report</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;700;800&display=swap"
-			rel="stylesheet"
-		/>
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body class="intro-active">
-		<!-- Opening loader animation with truck and decorative elements -->
-		<div id="openingLoader" class="opening-loader" aria-hidden="true">
-			<div class="loader">
-				<div class="truckWrapper">
-					<div class="truckBody">
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 198 93" class="trucksvg">
-							<path stroke-width="3" stroke="#282828" fill="#F83D3D" d="M135 22.5H177.264C178.295 22.5 179.22 23.133 179.594 24.0939L192.33 56.8443C192.442 57.1332 192.5 57.4404 192.5 57.7504V89C192.5 90.3807 191.381 91.5 190 91.5H135C133.619 91.5 132.5 90.3807 132.5 89V25C132.5 23.6193 133.619 22.5 135 22.5Z"></path>
-							<path stroke-width="3" stroke="#282828" fill="#7D7C7C" d="M146 33.5H181.741C182.779 33.5 183.709 34.1415 184.078 35.112L190.538 52.112C191.16 53.748 189.951 55.5 188.201 55.5H146C144.619 55.5 143.5 54.3807 143.5 53V36C143.5 34.6193 144.619 33.5 146 33.5Z"></path>
-							<path stroke-width="2" stroke="#282828" fill="#282828" d="M150 65C150 65.39 149.763 65.8656 149.127 66.2893C148.499 66.7083 147.573 67 146.5 67C145.427 67 144.501 66.7083 143.873 66.2893C143.237 65.8656 143 65.39 143 65C143 64.61 143.237 64.1344 143.873 63.7107C144.501 63.2917 145.427 63 146.5 63C147.573 63 148.499 63.2917 149.127 63.7107C149.763 64.1344 150 64.61 150 65Z"></path>
-							<rect stroke-width="2" stroke="#282828" fill="#FFFCAB" rx="1" height="7" width="5" y="63" x="187"></rect>
-							<rect stroke-width="2" stroke="#282828" fill="#282828" rx="1" height="11" width="4" y="81" x="193"></rect>
-							<rect stroke-width="3" stroke="#282828" fill="#DFDFDF" rx="2.5" height="90" width="121" y="1.5" x="6.5"></rect>
-							<rect stroke-width="2" stroke="#282828" fill="#DFDFDF" rx="2" height="4" width="6" y="84" x="1"></rect>
-						</svg>
-					</div>
-					<div class="truckTires">
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="tiresvg"><circle stroke-width="3" stroke="#282828" fill="#282828" r="13.5" cy="15" cx="15"></circle><circle fill="#DFDFDF" r="7" cy="15" cx="15"></circle></svg>
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="tiresvg"><circle stroke-width="3" stroke="#282828" fill="#282828" r="13.5" cy="15" cx="15"></circle><circle fill="#DFDFDF" r="7" cy="15" cx="15"></circle></svg>
-					</div>
-					<div class="road"></div>
-				</div>
-			</div>
-		</div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Wine Atlas | Complete Analytics Report</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body class="intro-active">
+        <div id="openingLoader" class="opening-loader" aria-hidden="true">
+            <div class="loader-shell" role="presentation">
+                <div class="loader-bottle" aria-hidden="true">
+                    <span class="loader-cork"></span>
+                    <span class="loader-glass"></span>
+                    <span class="loader-fill"></span>
+                    <span class="loader-reflection"></span>
+                </div>
+                <p class="loader-title">Curating Your Cellar Atlas</p>
+                <p class="loader-sub">Preparing review insights, trends, and flavors</p>
+                <div class="loader-progress" aria-hidden="true"><span></span></div>
+            </div>
+        </div>
 
-		<!-- Background decorative elements: animated orbs and grid pattern -->
-		<div class="bg-orb bg-orb-a" aria-hidden="true"></div>
-		<div class="bg-orb bg-orb-b" aria-hidden="true"></div>
-		<div class="bg-grid" aria-hidden="true"></div>
+        <div class="bg-veil bg-veil-a" aria-hidden="true"></div>
+        <div class="bg-veil bg-veil-b" aria-hidden="true"></div>
+        <div class="bg-texture" aria-hidden="true"></div>
 
-		<main class="page">
-			<!-- Hero section with introduction and dataset selection controls -->
-			<section class="hero">
-				<p class="eyebrow">Editorial Data Science Report</p>
-				<h1>Wine Atlas Dashboard</h1>
-				<p class="intro">
-					Complete exploratory, visual, and statistical analysis of wine reviews using
-					the provided datasets. Load data, inspect records, analyze chart trends,
-					and review generated insights.
-				</p>
+        <main class="app-layout">
+            <aside class="control-rail">
+                <section class="hero rail-card">
+                    <p class="eyebrow">Editorial Data Science Report</p>
+                    <h1>Wine Atlas Dashboard</h1>
+                    <p class="intro">
+                        Exploratory, visual, and statistical analysis of wine reviews across
+                        the provided datasets. Load data, inspect records, analyze chart
+                        patterns, and generate evidence-backed insights.
+                    </p>
 
-				<!-- Dataset selector and generate button -->
-				<div class="controls" role="group" aria-label="Dataset controls">
-					<label for="datasetSelect" class="sr-only">Choose dataset</label>
-					<select id="datasetSelect" aria-label="Dataset file selection">
-						<option value="./datasets/winemag-data-130k-v2.csv" selected>Main Dataset (130k v2)</option>
-						<option value="./datasets/winemag-data_first150k.csv">Legacy Dataset (first 150k)</option>
-					</select>
-					<button id="loadButton" type="button">Load Complete Report</button>
-				</div>
+                    <div class="controls" role="group" aria-label="Dataset controls">
+                        <label for="datasetSelect" class="sr-only">Choose dataset</label>
+                        <select id="datasetSelect" aria-label="Dataset file selection">
+                            <option value="./datasets/winemag-data-130k-v2.csv" selected>
+                                Main Dataset (130k v2)
+                            </option>
+                            <option value="./datasets/winemag-data_first150k.csv">
+                                Legacy Dataset (first 150k)
+                            </option>
+                        </select>
+                        <button id="loadButton" type="button">Build Full Report</button>
+                    </div>
 
-				<p id="status" class="status">Ready when you are.</p>
-			</section>
+                    <p id="status" class="status">Ready when you are.</p>
 
-			<section class="dataset-section hidden" id="datasetSection">
-				<div class="section-title-wrap">
-					<h2 class="section-title">01. Dataset Explorer</h2>
-					<p class="section-sub">Filter, sort, and inspect rows from the selected wine dataset.</p>
-				</div>
+                    <div class="rail-meta" aria-hidden="true">
+                        <p>Flow</p>
+                        <ol>
+                            <li>Load dataset</li>
+                            <li>Inspect records</li>
+                            <li>Review visuals</li>
+                            <li>Read statistical findings</li>
+                        </ol>
+                    </div>
+                </section>
+            </aside>
 
-				<div class="table-controls" role="group" aria-label="Table controls">
-					<input id="filterInput" type="text" placeholder="Filter by winery, variety, or country" />
-					<select id="sortSelect">
-						<option value="">Sort by...</option>
-						<option value="points">Points (high to low)</option>
-						<option value="price">Price (high to low)</option>
-						<option value="country">Country (A to Z)</option>
-						<option value="variety">Variety (A to Z)</option>
-					</select>
-					<button type="button" class="ghost-btn" onclick="applyFilterSort()">Apply</button>
-					<button type="button" class="ghost-btn" onclick="resetTable()">Reset</button>
-					<span id="rowCount" class="row-count">- rows</span>
-				</div>
+            <section class="content-deck">
+                <section id="summaryPanel" class="summary-panel hidden" aria-live="polite">
+                    <div class="summary-header">
+                        <h2 class="section-title">Snapshot Metrics</h2>
+                        <p class="section-sub">
+                            Fast read on score, price, variety leadership, and active table rows.
+                        </p>
+                    </div>
+                    <div class="summary-metrics">
+                        <div class="metric-card">
+                            <p class="metric-label">Total Reviews</p>
+                            <p id="metricTotal" class="metric-value">-</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="metric-label">Average Score</p>
+                            <p id="metricAvgScore" class="metric-value">-</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="metric-label">Median Price</p>
+                            <p id="metricMedianPrice" class="metric-value">-</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="metric-label">Rows In View</p>
+                            <p id="metricCountries" class="metric-value">-</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="metric-label">Top Variety</p>
+                            <p id="metricTopVariety" class="metric-value">-</p>
+                        </div>
+                    </div>
+                </section>
 
-				<div class="table-shell">
-					<table>
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Country</th>
-								<th>Variety</th>
-								<th>Winery</th>
-								<th>Points</th>
-								<th>Price</th>
-								<th>Province</th>
-							</tr>
-						</thead>
-						<tbody id="tableBody"></tbody>
-					</table>
-				</div>
-			</section>
+                <section class="report-columns">
+                    <section class="dataset-section hidden" id="datasetSection">
+                        <div class="section-title-wrap">
+                            <h2 class="section-title">Dataset Explorer</h2>
+                            <p class="section-sub">
+                                Filter, sort, and inspect rows from the selected wine dataset.
+                            </p>
+                        </div>
 
-			<section id="summaryPanel" class="summary-panel hidden" aria-live="polite">
-				<div class="metric-card"><p class="metric-label">Total Reviews</p><p id="metricTotal" class="metric-value">-</p></div>
-				<div class="metric-card"><p class="metric-label">Average Score</p><p id="metricAvgScore" class="metric-value">-</p></div>
-				<div class="metric-card"><p class="metric-label">Median Price</p><p id="metricMedianPrice" class="metric-value">-</p></div>
-				<div class="metric-card"><p class="metric-label">Total Results Popped Up</p><p id="metricCountries" class="metric-value">-</p></div>
-				<div class="metric-card"><p class="metric-label">Top Variety</p><p id="metricTopVariety" class="metric-value">-</p></div>
-			</section>
+                        <div class="table-controls" role="group" aria-label="Table controls">
+                            <input
+                                id="filterInput"
+                                type="text"
+                                placeholder="Filter by winery, variety, or country"
+                            />
+                            <select id="sortSelect">
+                                <option value="">Sort by...</option>
+                                <option value="points">Points (high to low)</option>
+                                <option value="price">Price (high to low)</option>
+                                <option value="country">Country (A to Z)</option>
+                                <option value="variety">Variety (A to Z)</option>
+                            </select>
+                            <button type="button" class="ghost-btn" onclick="applyFilterSort()">
+                                Apply
+                            </button>
+                            <button type="button" class="ghost-btn" onclick="resetTable()">
+                                Reset
+                            </button>
+                            <span id="rowCount" class="row-count">- rows</span>
+                        </div>
 
-			<section class="section-title-wrap hidden" id="vizHeader">
-				<h2 class="section-title">02. Visualizations</h2>
-				<p class="section-sub">Multi-view visual analysis of countries, quality, price, and flavor language.</p>
-			</section>
+                        <div class="table-shell">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Country</th>
+                                        <th>Variety</th>
+                                        <th>Winery</th>
+                                        <th>Points</th>
+                                        <th>Price</th>
+                                        <th>Province</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody"></tbody>
+                            </table>
+                        </div>
+                    </section>
 
-			<section id="dashboard" class="viz-grid hidden" aria-live="polite">
-				<article class="viz-card"><h2>Where Reviews Come From</h2><p>Top producing countries by review volume.</p><div id="countryVolumeChart" class="chart" role="img" aria-label="Country review volume chart"></div></article>
-				<article class="viz-card"><h2>Quality Leaders By Country</h2><p>Average score ranking among countries with meaningful volume.</p><div id="countryQualityChart" class="chart" role="img" aria-label="Country quality ranking chart"></div></article>
-				<article class="viz-card"><h2>Price Distribution</h2><p>Histogram of bottle prices (outliers trimmed for readability).</p><div id="priceDistributionChart" class="chart" role="img" aria-label="Price distribution histogram"></div></article>
-				<article class="viz-card"><h2>Score Distribution</h2><p>Distribution of review points across the dataset.</p><div id="scoreDistributionChart" class="chart" role="img" aria-label="Score distribution histogram"></div></article>
-				<article class="viz-card wide"><h2>Price vs Score</h2><p>Sampled scatter for price-to-quality relationship.</p><div id="priceScoreScatterChart" class="chart" role="img" aria-label="Price versus score scatter plot"></div></article>
-				<article class="viz-card"><h2>Variety Landscape</h2><p>Treemap of most-reviewed grape varieties.</p><div id="varietyTreemapChart" class="chart" role="img" aria-label="Variety treemap"></div></article>
-				<article class="viz-card"><h2>Winery Leaders</h2><p>Most frequently reviewed wineries.</p><div id="wineryLeadersChart" class="chart" role="img" aria-label="Top winery bar chart"></div></article>
-				<article class="viz-card"><h2>Price Spread In Key Countries</h2><p>Box plots of price variability across major countries.</p><div id="priceByCountryChart" class="chart" role="img" aria-label="Price by country box plot"></div></article>
-				<article class="viz-card"><h2>Score Bands</h2><p>Proportions across quality tiers.</p><div id="scoreBandsChart" class="chart" role="img" aria-label="Score band donut chart"></div></article>
-				<article class="viz-card"><h2>Value Index By Country</h2><p>Score-per-dollar leaders with volume threshold.</p><div id="valueIndexChart" class="chart" role="img" aria-label="Value index by country"></div></article>
-				<article class="viz-card"><h2>Flavor Lexicon</h2><p>Most frequent descriptive terms in reviews.</p><div id="flavorLexiconChart" class="chart" role="img" aria-label="Flavor lexicon bar chart"></div></article>
-			</section>
+                    <section id="analysisSection" class="analysis-section hidden">
+                        <div class="section-title-wrap">
+                            <h2 class="section-title">Statistical Analysis</h2>
+                            <p class="section-sub">
+                                Descriptive statistics, correlation, regression, and narrative insights.
+                            </p>
+                        </div>
 
-			<section id="analysisSection" class="analysis-section hidden">
-				<div class="section-title-wrap">
-					<h2 class="section-title">03. Statistical Analysis</h2>
-					<p class="section-sub">Descriptive statistics, correlation, regression, and narrative insights.</p>
-				</div>
+                        <div class="analysis-grid">
+                            <article class="analysis-card">
+                                <h3>Descriptive Statistics</h3>
+                                <ul class="kv-list">
+                                    <li><span>n (sample size)</span><strong id="an">-</strong></li>
+                                    <li><span>Min score</span><strong id="aMin">-</strong></li>
+                                    <li><span>Max score</span><strong id="aMax">-</strong></li>
+                                    <li><span>Range</span><strong id="aRange">-</strong></li>
+                                    <li><span>Variance</span><strong id="aVariance">-</strong></li>
+                                    <li><span>Std Dev</span><strong id="aStdDev">-</strong></li>
+                                </ul>
+                            </article>
 
-				<div class="analysis-grid">
-					<article class="analysis-card">
-						<h3>Descriptive Statistics</h3>
-						<ul class="kv-list">
-							<li><span>n (sample size)</span><strong id="an">-</strong></li>
-							<li><span>Min score</span><strong id="aMin">-</strong></li>
-							<li><span>Max score</span><strong id="aMax">-</strong></li>
-							<li><span>Range</span><strong id="aRange">-</strong></li>
-							<li><span>Variance</span><strong id="aVariance">-</strong></li>
-							<li><span>Std Dev</span><strong id="aStdDev">-</strong></li>
-						</ul>
-					</article>
+                            <article class="analysis-card">
+                                <h3>Correlation Analysis</h3>
+                                <ul class="kv-list">
+                                    <li><span>Pearson r (price to score)</span><strong id="rPearson">-</strong></li>
+                                    <li><span>Interpretation</span><strong id="rInterp">-</strong></li>
+                                    <li>
+                                        <span>Pearson r (description length to score)</span>
+                                        <strong id="rPearson2">-</strong>
+                                    </li>
+                                    <li><span>Interpretation</span><strong id="rInterp2">-</strong></li>
+                                    <li><span>Stronger predictor</span><strong id="rStronger">-</strong></li>
+                                    <li><span>Direction</span><strong id="rDirection">-</strong></li>
+                                </ul>
+                            </article>
 
-					<article class="analysis-card">
-						<h3>Correlation Analysis</h3>
-						<ul class="kv-list">
-							<li><span>Pearson r (price to score)</span><strong id="rPearson">-</strong></li>
-							<li><span>Interpretation</span><strong id="rInterp">-</strong></li>
-							<li><span>Pearson r (description length to score)</span><strong id="rPearson2">-</strong></li>
-							<li><span>Interpretation</span><strong id="rInterp2">-</strong></li>
-							<li><span>Stronger predictor</span><strong id="rStronger">-</strong></li>
-							<li><span>Direction</span><strong id="rDirection">-</strong></li>
-						</ul>
-					</article>
+                            <article class="analysis-card">
+                                <h3>Linear Regression</h3>
+                                <ul class="kv-list">
+                                    <li><span>Equation</span><strong id="regEquation">-</strong></li>
+                                    <li><span>Slope (m)</span><strong id="regSlope">-</strong></li>
+                                    <li><span>Intercept (b)</span><strong id="regIntercept">-</strong></li>
+                                    <li><span>R2</span><strong id="regR2">-</strong></li>
+                                    <li><span>Interpretation</span><strong id="regInterp">-</strong></li>
+                                    <li><span>Predicted score @ $50</span><strong id="regPredict">-</strong></li>
+                                </ul>
+                            </article>
+                        </div>
 
-					<article class="analysis-card">
-						<h3>Linear Regression</h3>
-						<ul class="kv-list">
-							<li><span>Equation</span><strong id="regEquation">-</strong></li>
-							<li><span>Slope (m)</span><strong id="regSlope">-</strong></li>
-							<li><span>Intercept (b)</span><strong id="regIntercept">-</strong></li>
-							<li><span>R²</span><strong id="regR2">-</strong></li>
-							<li><span>Interpretation</span><strong id="regInterp">-</strong></li>
-							<li><span>Predicted score @ $50</span><strong id="regPredict">-</strong></li>
-						</ul>
-					</article>
-				</div>
+                        <article class="insights-card">
+                            <h3>Data-Driven Insights</h3>
+                            <div id="insightsBody">
+                                <p class="placeholder-insight">
+                                    Load a dataset to generate the narrative findings.
+                                </p>
+                            </div>
+                        </article>
+                    </section>
+                </section>
 
-				<article class="insights-card">
-					<h3>Data-Driven Insights</h3>
-					<div id="insightsBody"><p class="placeholder-insight">Load a dataset to generate the narrative findings.</p></div>
-				</article>
-			</section>
-		</main>
+                <section class="section-title-wrap hidden" id="vizHeader">
+                    <h2 class="section-title">Visualizations</h2>
+                    <p class="section-sub">
+                        Multi-view analysis of countries, quality, price, value, and flavor language.
+                    </p>
+                </section>
 
-		<div id="vizModal" class="viz-modal" aria-hidden="true">
-			<div class="viz-modal-panel" role="dialog" aria-modal="true" aria-labelledby="vizModalTitle">
-				<div class="viz-modal-header">
-					<div>
-						<h3 id="vizModalTitle">Expanded Visualization</h3>
-						<p id="vizModalDescription">Detailed chart view</p>
-					</div>
-					<button id="closeVizModal" type="button" class="viz-modal-close" aria-label="Close expanded visualization">Close</button>
-				</div>
-				<div id="modalChart" class="viz-modal-chart" role="img" aria-label="Expanded chart"></div>
-			</div>
-		</div>
+                <section id="dashboard" class="viz-grid hidden" aria-live="polite">
+                    <article class="viz-card">
+                        <h2>Where Reviews Come From</h2>
+                        <p>Top producing countries by review volume.</p>
+                        <div id="countryVolumeChart" class="chart" role="img" aria-label="Country review volume chart"></div>
+                    </article>
+                    <article class="viz-card">
+                        <h2>Quality Leaders By Country</h2>
+                        <p>Average score ranking among countries with meaningful volume.</p>
+                        <div id="countryQualityChart" class="chart" role="img" aria-label="Country quality ranking chart"></div>
+                    </article>
+                    <article class="viz-card">
+                        <h2>Price Distribution</h2>
+                        <p>Histogram of bottle prices (outliers trimmed for readability).</p>
+                        <div id="priceDistributionChart" class="chart" role="img" aria-label="Price distribution histogram"></div>
+                    </article>
+                    <article class="viz-card">
+                        <h2>Score Distribution</h2>
+                        <p>Distribution of review points across the dataset.</p>
+                        <div id="scoreDistributionChart" class="chart" role="img" aria-label="Score distribution histogram"></div>
+                    </article>
+                    <article class="viz-card wide">
+                        <h2>Price vs Score</h2>
+                        <p>Sampled scatter for price-to-quality relationship.</p>
+                        <div id="priceScoreScatterChart" class="chart" role="img" aria-label="Price versus score scatter plot"></div>
+                    </article>
+                    <article class="viz-card">
+                        <h2>Variety Landscape</h2>
+                        <p>Treemap of most-reviewed grape varieties.</p>
+                        <div id="varietyTreemapChart" class="chart" role="img" aria-label="Variety treemap"></div>
+                    </article>
+                    <article class="viz-card">
+                        <h2>Winery Leaders</h2>
+                        <p>Most frequently reviewed wineries.</p>
+                        <div id="wineryLeadersChart" class="chart" role="img" aria-label="Top winery bar chart"></div>
+                    </article>
+                    <article class="viz-card">
+                        <h2>Price Spread In Key Countries</h2>
+                        <p>Box plots of price variability across major countries.</p>
+                        <div id="priceByCountryChart" class="chart" role="img" aria-label="Price by country box plot"></div>
+                    </article>
+                    <article class="viz-card">
+                        <h2>Score Bands</h2>
+                        <p>Proportions across quality tiers.</p>
+                        <div id="scoreBandsChart" class="chart" role="img" aria-label="Score band donut chart"></div>
+                    </article>
+                    <article class="viz-card">
+                        <h2>Value Index By Country</h2>
+                        <p>Score-per-dollar leaders with volume threshold.</p>
+                        <div id="valueIndexChart" class="chart" role="img" aria-label="Value index by country"></div>
+                    </article>
+                    <article class="viz-card">
+                        <h2>Flavor Lexicon</h2>
+                        <p>Most frequent descriptive terms in reviews.</p>
+                        <div id="flavorLexiconChart" class="chart" role="img" aria-label="Flavor lexicon bar chart"></div>
+                    </article>
+                </section>
+            </section>
+        </main>
 
-		<script>
-			(function () {
-				const LOADER_DURATION_MS = 3000;
-				const LOADER_EXIT_MS = 1000;
+        <div id="vizModal" class="viz-modal" aria-hidden="true">
+            <div class="viz-modal-panel" role="dialog" aria-modal="true" aria-labelledby="vizModalTitle">
+                <div class="viz-modal-header">
+                    <div>
+                        <h3 id="vizModalTitle">Expanded Visualization</h3>
+                        <p id="vizModalDescription">Detailed chart view</p>
+                    </div>
+                    <button
+                        id="closeVizModal"
+                        type="button"
+                        class="viz-modal-close"
+                        aria-label="Close expanded visualization"
+                    >
+                        Close
+                    </button>
+                </div>
+                <div id="modalChart" class="viz-modal-chart" role="img" aria-label="Expanded chart"></div>
+            </div>
+        </div>
 
-				window.setTimeout(function dismissOpeningLoaderFallback() {
-					const loader = document.getElementById("openingLoader");
-					if (loader) {
-						loader.classList.add("exit");
-						window.setTimeout(function removeLoader() {
-							if (loader.parentNode) {
-								loader.parentNode.removeChild(loader);
-							}
-						}, LOADER_EXIT_MS);
-					}
-					if (document.body) {
-						document.body.classList.remove("intro-active");
-					}
-				}, LOADER_DURATION_MS);
-			})();
-		</script>
+        <script>
+            (function () {
+                const LOADER_DURATION_MS = 3000;
+                const LOADER_EXIT_MS = 1000;
 
-		<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-		<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-		<script src="script.js"></script>
-	</body>
+                window.setTimeout(function dismissOpeningLoaderFallback() {
+                    const loader = document.getElementById("openingLoader");
+                    if (loader) {
+                        loader.classList.add("exit");
+                        window.setTimeout(function removeLoader() {
+                            if (loader.parentNode) {
+                                loader.parentNode.removeChild(loader);
+                            }
+                        }, LOADER_EXIT_MS);
+                    }
+                    if (document.body) {
+                        document.body.classList.remove("intro-active");
+                    }
+                }, LOADER_DURATION_MS);
+            })();
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+        <script src="script.js"></script>
+    </body>
 </html>
